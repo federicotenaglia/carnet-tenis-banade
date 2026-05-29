@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carnet Digital - Tenis Banade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      padding: 20px;
+    }
+    .carnet {
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .carnet::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .carnet::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .club-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, #00d4ff, #7b2fff);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(0,212,255,0.3);
+    }
+    .club-info h1 { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; }
+    .club-info p { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.5px; margin-top: 2px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.25);
+      border-radius: 20px; padding: 4px 12px; margin-bottom: 20px;
+    }
+    .badge-dot { width: 6px; height: 6px; background: #00d4ff; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+    .badge span { font-size: 10px; font-weight: 600; color: #00d4ff; letter-spacing: 1px; text-transform: uppercase; }
+    .student-name { font-size: 22px; font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.3px; }
+    .student-dni { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 28px; letter-spacing: 0.5px; }
+    .student-dni span { color: rgba(255,255,255,0.8); font-weight: 600; }
+    .qr-container {
+      background: #fff; border-radius: 20px; padding: 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      margin-bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .qr-container img { width: 200px; height: 200px; display: block; }
+    .qr-label { font-size: 10px; color: #666; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .info-row { display: flex; gap: 10px; margin-bottom: 20px; }
+    .info-card {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 12px;
+    }
+    .info-card label { font-size: 9px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; }
+    .info-card value { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85); }
+    .footer { text-align: center; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .footer p { font-size: 10px; color: rgba(255,255,255,0.25); line-height: 1.6; }
+    .loading { text-align: center; color: rgba(255,255,255,0.5); font-size: 14px; padding: 20px; }
+    .error { background: rgba(255,50,50,0.1); border: 1px solid rgba(255,50,50,0.2); border-radius: 12px; padding: 16px; text-align: center; color: #ff6b6b; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="carnet" id="carnet"><div class="loading">Cargando carnet...</div></div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const name   = params.get('name')   || '';
+    const dni    = params.get('dni')    || '';
+    const codigo = params.get('codigo') || '';
+    const carnet = document.getElementById('carnet');
+    if (!name || !codigo) {
+      carnet.innerHTML = '<div class="error">&#127934; Link de carnet invalido.<br>Solicita tu carnet a la coordinacion de tenis.</div>';
+    } else {
+      const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?bgcolor=FFFFFF&size=200x200&data=' + encodeURIComponent(codigo);
+      carnet.innerHTML = '<div class="header"><div class="club-icon">&#127934;</div><div class="club-info"><h1>Club Banade</h1><p>Escuela de Tenis</p></div></div><div class="badge"><div class="badge-dot"></div><span>Carnet Digital &middot; Activo</span></div><div class="student-name">' + name + '</div><div class="student-dni">DNI <span>' + dni + '</span></div><div class="qr-container"><img src="' + qrUrl + '" alt="QR Carnet" /><div class="qr-label">Mostra este QR al portero</div></div><div class="info-row"><div class="info-card"><label>Tipo</label><value>Alumno Tenis</value></div><div class="info-card"><label>Estado</label><value style="color:#4ade80">&#9679; Activo</value></div></div><div class="footer"><p>Personal e intransferible &middot; Club Banco Nacional de Desarrollo<br>Presenta este QR en porteria para ingresar</p></div>';
+    }
+  </script>
+</body>
+</html>
