@@ -27,9 +27,8 @@
       pointer-events: none;
     }
     .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .club-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; background: linear-gradient(135deg,#00d4ff,#7b2fff); }
+    .club-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; box-shadow: 0 4px 15px rgba(0,212,255,0.25); }
     .club-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
-    .club-icon span { font-size: 26px; }
     .club-info h1 { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; }
     .club-info p { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.5px; margin-top: 2px; }
     .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.25); border-radius: 20px; padding: 4px 12px; margin-bottom: 20px; }
@@ -55,18 +54,30 @@
 <body>
   <div class="carnet" id="carnet"><div class="loading">Cargando carnet...</div></div>
   <script>
+    var LOGO_URL = 'https://res.cloudinary.com/dscec3xf1/image/upload/v1780093964/LogoBanadeTenis_fyiolx.png';
     var params = new URLSearchParams(window.location.search);
     var name   = params.get('name')   || '';
     var dni    = params.get('dni')    || '';
     var codigo = params.get('codigo') || '';
-    var logo   = params.get('logo')   || '';
     var carnet = document.getElementById('carnet');
     if (!name || !codigo) {
       carnet.innerHTML = '<div class="error">&#128683; Link de carnet invalido.<br>Solicita tu carnet a la coordinacion de tenis.</div>';
     } else {
       var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?bgcolor=FFFFFF&size=200x200&data=' + encodeURIComponent(codigo);
-      var iconHtml = logo ? '<img src="' + logo + '" alt="Logo" />' : '<span>&#127934;</span>';
-      carnet.innerHTML = '<div class="header"><div class="club-icon">' + iconHtml + '</div><div class="club-info"><h1>Club Banade</h1><p>Escuela de Tenis</p></div></div><div class="badge"><div class="badge-dot"></div><span>Carnet Digital &middot; Activo</span></div><div class="student-name">' + name + '</div><div class="student-dni">DNI <span>' + dni + '</span></div><div class="qr-container"><img src="' + qrUrl + '" alt="QR Carnet" /><div class="qr-label">Mostra este QR al portero</div></div><div class="info-row"><div class="info-card"><label>Tipo</label><value>Alumno Tenis</value></div><div class="info-card"><label>Estado</label><value style="color:#4ade80">&#9679; Activo</value></div></div><div class="footer"><p>Personal e intransferible &middot; Club Banco Nacional de Desarrollo<br>Presenta este QR en porteria para ingresar</p></div>';
+      carnet.innerHTML =
+        '<div class="header">' +
+          '<div class="club-icon"><img src="' + LOGO_URL + '" alt="Logo Banade Tenis" /></div>' +
+          '<div class="club-info"><h1>Club Banade</h1><p>Escuela de Tenis</p></div>' +
+        '</div>' +
+        '<div class="badge"><div class="badge-dot"></div><span>Carnet Digital &middot; Activo</span></div>' +
+        '<div class="student-name">' + name + '</div>' +
+        '<div class="student-dni">DNI <span>' + dni + '</span></div>' +
+        '<div class="qr-container"><img src="' + qrUrl + '" alt="QR Carnet" /><div class="qr-label">Mostra este QR al portero</div></div>' +
+        '<div class="info-row">' +
+          '<div class="info-card"><label>Tipo</label><value>Alumno Tenis</value></div>' +
+          '<div class="info-card"><label>Estado</label><value style="color:#4ade80">&#9679; Activo</value></div>' +
+        '</div>' +
+        '<div class="footer"><p>Personal e intransferible &middot; Club Banco Nacional de Desarrollo<br>Presenta este QR en porteria para ingresar</p></div>';
     }
   </script>
 </body>
