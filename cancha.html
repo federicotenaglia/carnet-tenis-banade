@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Autorización de Ingreso - Tenis Banade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0d1b0f, #1a3a20, #0f2d1a);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Inter', sans-serif; padding: 20px;
+    }
+    .carnet {
+      background: linear-gradient(160deg, #0d1f0f 0%, #122a14 50%, #0a2210 100%);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: 24px; padding: 32px 28px; width: 100%; max-width: 360px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(74,222,128,0.08), inset 0 1px 0 rgba(74,222,128,0.1);
+      position: relative; overflow: hidden;
+    }
+    .carnet::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(74,222,128,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .carnet::after {
+      content: ''; position: absolute; bottom: -40px; left: -40px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(34,197,94,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(74,222,128,0.1); }
+    .club-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; box-shadow: 0 4px 15px rgba(74,222,128,0.2); }
+    .club-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+    .club-info h1 { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; }
+    .club-info p { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.5px; margin-top: 2px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); border-radius: 20px; padding: 4px 12px; margin-bottom: 20px; }
+    .badge-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+    .badge span { font-size: 10px; font-weight: 600; color: #4ade80; letter-spacing: 1px; text-transform: uppercase; }
+    .player-name { font-size: 22px; font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 18px; }
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .detail-card { background: rgba(74,222,128,0.05); border: 1px solid rgba(74,222,128,0.12); border-radius: 12px; padding: 12px; }
+    .detail-card.full { grid-column: 1 / -1; }
+    .detail-card label { font-size: 9px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+    .detail-card value { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.9); }
+    .detail-card value.highlight { color: #4ade80; font-size: 18px; }
+    .qr-container { background: #fff; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .qr-container img { width: 200px; height: 200px; display: block; }
+    .qr-label { font-size: 10px; color: #555; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .warning { display: flex; align-items: flex-start; gap: 8px; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+    .warning-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .warning p { font-size: 11px; color: rgba(251,191,36,0.9); line-height: 1.5; }
+    .footer { text-align: center; padding-top: 14px; border-top: 1px solid rgba(74,222,128,0.08); }
+    .footer p { font-size: 10px; color: rgba(255,255,255,0.2); line-height: 1.6; }
+    .loading { text-align: center; color: rgba(255,255,255,0.5); font-size: 14px; padding: 20px; }
+    .error { background: rgba(255,50,50,0.1); border: 1px solid rgba(255,50,50,0.2); border-radius: 12px; padding: 16px; text-align: center; color: #ff6b6b; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="carnet" id="carnet"><div class="loading">Cargando autorizacion...</div></div>
+  <script>
+    var LOGO_URL = 'https://res.cloudinary.com/dscec3xf1/image/upload/v1780093964/LogoBanadeTenis_fyiolx.png';
+    var params = new URLSearchParams(window.location.search);
+    var name   = params.get('name')   || '';
+    var fecha  = params.get('fecha')  || '';
+    var cancha = params.get('cancha') || '';
+    var codigo = params.get('codigo') || '';
+    var carnet = document.getElementById('carnet');
+    if (!name || !codigo) {
+      carnet.innerHTML = '<div class="error">&#128683; Autorizacion invalida.<br>Contacta a la coordinacion de tenis.</div>';
+    } else {
+      var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?bgcolor=FFFFFF&size=200x200&data=' + encodeURIComponent(codigo);
+      carnet.innerHTML =
+        '<div class="header">' +
+          '<div class="club-icon"><img src="' + LOGO_URL + '" alt="Logo Banade Tenis" /></div>' +
+          '<div class="club-info"><h1>Club Banade</h1><p>Alquiler de Cancha</p></div>' +
+        '</div>' +
+        '<div class="badge"><div class="badge-dot"></div><span>Autorizacion de Ingreso</span></div>' +
+        '<div class="player-name">' + name + '</div>' +
+        '<div class="details-grid">' +
+          '<div class="detail-card"><label>Fecha</label><value>' + fecha + '</value></div>' +
+          '<div class="detail-card"><label>Cancha</label><value class="highlight">' + cancha + '</value></div>' +
+        '</div>' +
+        '<div class="qr-container"><img src="' + qrUrl + '" alt="QR Autorizacion" /><div class="qr-label">Mostra este QR al portero</div></div>' +
+        '<div class="warning"><div class="warning-icon">&#9888;&#65039;</div><p>Valido solo para el dia indicado. Maximo 4 personas por cancha.</p></div>' +
+        '<div class="footer"><p>Club Banco Nacional de Desarrollo &middot; Tenis Banade<br>No transferible &middot; Un uso por fecha</p></div>';
+    }
+  </script>
+</body>
+</html>
